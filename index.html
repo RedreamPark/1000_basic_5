@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>영문법 · 5형식 종합 퀴즈</title>
+<style>
+:root{
+  --green:#1D9E75;--green-d:#0F6E56;--green-l:#E1F5EE;--green-deep:#085041;
+  --red:#A32D2D;--red-l:#FCEBEB;--red-deep:#501313;
+  --amber:#BA7517;--amber-l:#FAEEDA;--amber-deep:#633806;
+  --blue:#185FA5;--blue-l:#E6F1FB;--blue-deep:#0C3A6B;
+  --purple:#6B3FA0;--purple-l:#F0EAF9;--purple-deep:#2E1248;
+  --bg:#F5F3EF;--card:#FFFFFF;--border:rgba(0,0,0,0.08);
+  --text:#1a1a1a;--muted:#666;--hint:#aaa;
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#app{max-width:700px;margin:0 auto;padding:24px 16px 60px;}
+.intro-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:2.5rem 2rem;text-align:center;margin-top:16px;}
+.intro-logo{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--green);text-transform:uppercase;margin-bottom:18px;}
+.intro-title{font-size:26px;font-weight:800;line-height:1.3;margin-bottom:6px;}
+.intro-sub{font-size:14px;color:var(--muted);margin-bottom:24px;}
+.type-legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.info-card{background:var(--bg);border-radius:var(--rs);padding:14px 8px;text-align:center;}
+.info-num{font-size:22px;font-weight:800;color:var(--green);}
+.info-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;}
+.time-card{background:var(--bg);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.time-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.time-lbl{font-size:12px;color:var(--muted);}
+.time-val{font-size:13px;font-weight:700;color:var(--text);}
+.start-btn{width:100%;padding:16px;font-size:16px;font-weight:800;font-family:inherit;background:var(--green);color:#fff;border:none;border-radius:var(--r);cursor:pointer;transition:background .15s,transform .1s;}
+.start-btn:hover{background:var(--green-d);}
+.start-btn:active{transform:scale(.98);}
+.type-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;}
+.tb-g{background:var(--blue-l);color:var(--blue-deep);}
+.tb-b{background:var(--purple-l);color:var(--purple-deep);}
+.tb-o{background:var(--amber-l);color:var(--amber-deep);}
+.hd-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.quiz-counter{font-size:13px;font-weight:700;color:var(--muted);}
+.cutline-chip{font-size:12px;font-weight:700;color:var(--green-deep);background:var(--green-l);padding:3px 10px;border-radius:99px;}
+.progress-wrap{height:5px;background:#DDD;border-radius:99px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:5px;background:var(--green);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.timer-row{display:flex;justify-content:flex-end;margin-bottom:12px;}
+.timer-block{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.timer-lbl{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.05em;}
+.timer-ring{position:relative;width:52px;height:52px;}
+.timer-ring svg{transform:rotate(-90deg);}
+.timer-ring circle{fill:none;stroke-width:4;}
+.ring-bg{stroke:#E0E0E0;}
+.ring-fill{stroke:var(--green);stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .4s;}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--text);transition:color .3s;}
+.tw .ring-fill{stroke:var(--amber);}.tw .timer-num{color:var(--amber);}
+.td .ring-fill{stroke:var(--red);}.td .timer-num{color:var(--red);}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.td .timer-ring{animation:pulse .8s infinite;}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:14px;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.q-num{font-size:11px;color:var(--hint);margin-bottom:8px;letter-spacing:.05em;}
+.q-ko{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;padding:8px 12px;background:var(--bg);border-radius:var(--rs);}
+.q-en{font-size:15px;line-height:1.9;margin-bottom:14px;color:var(--text);font-style:italic;}
+.q-sub{font-size:14px;color:var(--text);margin-bottom:14px;line-height:1.7;}
+.blank-tag{font-weight:800;color:var(--blue);background:var(--blue-l);padding:2px 8px;border-radius:5px;margin:0 2px;}
+.blank-lbl{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:600;}
+.choices{display:flex;gap:8px;flex-wrap:wrap;}
+.choice-btn{flex:1;min-width:80px;padding:11px 12px;font-size:14px;font-family:inherit;border:1.5px solid var(--border);border-radius:var(--rs);background:var(--card);color:var(--text);cursor:pointer;text-align:center;font-weight:600;transition:all .12s;}
+.choice-btn:hover:not(:disabled){border-color:var(--green);background:var(--green-l);color:var(--green-deep);}
+.choice-btn.correct{background:var(--green-l);border-color:var(--green);color:var(--green-deep);font-weight:800;}
+.choice-btn.wrong{background:var(--red-l);border-color:var(--red);color:var(--red-deep);}
+.choice-btn:disabled{cursor:default;}
+.blank-hint{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.blank-input-wrap{display:flex;gap:8px;align-items:stretch;}
+.blank-input{flex:1;padding:11px 13px;font-size:15px;font-family:inherit;border:1.5px solid #CCC;border-radius:var(--rs);background:#FAFAFA;color:var(--text);outline:none;transition:border-color .15s;}
+.blank-input:focus{border-color:var(--purple);background:#fff;}
+.blank-input.correct{border-color:var(--green);background:var(--green-l);color:var(--green-deep);}
+.blank-input.wrong{border-color:var(--red);background:var(--red-l);color:var(--red-deep);}
+.submit-btn{padding:11px 16px;font-size:14px;font-weight:700;font-family:inherit;background:var(--purple);color:#fff;border:none;border-radius:var(--rs);cursor:pointer;white-space:nowrap;transition:background .12s;}
+.submit-btn:hover{background:var(--purple-deep);}
+.answer-reveal{margin-top:10px;padding:9px 13px;border-radius:var(--rs);font-size:13px;font-weight:600;}
+.ar-ok{background:var(--green-l);color:var(--green-deep);}
+.ar-ng{background:var(--red-l);color:var(--red-deep);}
+.order-area-lbl{font-size:11px;color:var(--hint);margin-bottom:6px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.order-area{min-height:50px;border:2px dashed #DDD;border-radius:var(--rs);padding:8px 10px;display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;align-items:center;transition:border-color .2s;}
+.order-area.filled{border-color:var(--amber);background:var(--amber-l);}
+.word-chip{padding:7px 13px;font-size:14px;font-weight:600;border-radius:99px;cursor:pointer;transition:all .14s;user-select:none;white-space:nowrap;}
+.wc-avail{background:var(--card);border:1.5px solid var(--border);color:var(--text);}
+.wc-avail:hover{border-color:var(--amber);background:var(--amber-l);color:var(--amber-deep);}
+.wc-placed{background:var(--amber-l);border:1.5px solid var(--amber);color:var(--amber-deep);}
+.wc-placed:hover{background:#FDEBD0;border-color:#D4881A;}
+.order-check-btn{width:100%;padding:12px;font-size:14px;font-weight:800;font-family:inherit;background:var(--amber);color:#fff;border:none;border-radius:var(--rs);cursor:pointer;margin-top:6px;transition:background .12s;}
+.order-check-btn:hover:not(:disabled){background:var(--amber-deep);}
+.order-check-btn:disabled{background:#CCC;cursor:default;}
+.timeout-msg{margin-top:10px;padding:10px 14px;border-radius:var(--rs);font-size:13px;font-weight:600;background:var(--amber-l);color:var(--amber-deep);border:1px solid #FAC775;}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:30px 22px;text-align:center;margin-bottom:14px;}
+.result-emoji{font-size:46px;margin-bottom:10px;}
+.result-score{font-size:54px;font-weight:800;line-height:1;margin-bottom:8px;}
+.score-pass{color:var(--green);}.score-fail{color:var(--red);}
+.result-badge{display:inline-block;padding:5px 16px;border-radius:99px;font-size:14px;font-weight:800;margin-bottom:8px;}
+.badge-pass{background:var(--green-l);color:var(--green-deep);}
+.badge-fail{background:var(--red-l);color:var(--red-deep);}
+.result-pct{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.stat-row{display:flex;gap:10px;justify-content:center;margin-bottom:24px;flex-wrap:wrap;}
+.stat-card{background:var(--bg);border-radius:var(--rs);padding:12px 16px;}
+.stat-num{font-size:22px;font-weight:800;}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.s-ok{color:var(--green);}.s-ng{color:var(--red);}.s-to{color:var(--amber);}
+.retry-btn{width:100%;padding:14px;font-size:15px;font-weight:800;font-family:inherit;background:var(--green);color:#fff;border:none;border-radius:var(--r);cursor:pointer;transition:background .15s,transform .1s;}
+.retry-btn:hover{background:var(--green-d);}
+.retry-btn:active{transform:scale(.98);}
+.review-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:10px;margin-top:14px;}
+.review-item{background:var(--card);border:1px solid #F09595;border-radius:var(--rs);padding:13px 15px;margin-bottom:8px;}
+.review-item.to{border-color:#FAC775;}
+.r-num{font-size:11px;color:var(--hint);margin-bottom:6px;}
+.r-ko{font-size:12px;color:var(--muted);margin-bottom:4px;line-height:1.6;}
+.r-en{font-size:13px;color:var(--text);margin-bottom:8px;line-height:1.8;font-style:italic;}
+.tag{display:inline-block;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700;margin-right:4px;margin-top:2px;}
+.tag-ng{background:var(--red-l);color:var(--red-deep);}
+.tag-ok{background:var(--green-l);color:var(--green-deep);}
+.tag-to{background:var(--amber-l);color:var(--amber-deep);}
+.hist-section{margin-top:20px;}
+.hist-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.hist-clear{font-size:11px;font-weight:600;color:var(--red);background:none;border:none;cursor:pointer;padding:2px 6px;}
+.hist-empty{font-size:13px;color:var(--hint);text-align:center;padding:20px 0;}
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:12px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.hist-item:hover{border-color:var(--green);}
+.hist-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.hist-left{flex:1;}
+.hist-date{font-size:11px;color:var(--hint);margin-bottom:4px;}
+.hist-score{font-size:18px;font-weight:800;}
+.hist-score.pass{color:var(--green);}.hist-score.fail{color:var(--red);}
+.hist-pct{font-size:12px;color:var(--muted);margin-top:2px;}
+.hist-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;}
+.hb-pass{background:var(--green-l);color:var(--green-deep);}
+.hb-fail{background:var(--red-l);color:var(--red-deep);}
+.hist-bar-wrap{width:80px;height:6px;background:#E0E0E0;border-radius:99px;overflow:hidden;margin-top:4px;}
+.hist-bar{height:6px;border-radius:99px;}
+.hist-detail{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:none;}
+.hist-detail.open{display:block;}
+.hd-item{background:var(--bg);border-radius:var(--rs);padding:10px 12px;margin-bottom:6px;}
+.hd-item.hd-to{border-left:3px solid var(--amber);}
+.hd-item.hd-ng{border-left:3px solid var(--red);}
+.hd-qnum{font-size:10px;color:var(--hint);margin-bottom:4px;}
+.hd-en{font-size:12px;color:var(--text);margin-bottom:5px;line-height:1.7;font-style:italic;}
+.hd-tags{display:flex;flex-wrap:wrap;gap:4px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const ALL_Q = [
+  // ── Part 1: 구성요소 선택 (g) ──────────────────────────────
+  {n:'P1-1',t:'g',sub:"Accepting our imperfections can make us better people",q:'"make"의 역할은?',c:['Vi(자동사)','Vt(타동사)','SC','OC'],a:'Vt(타동사)'},
+  {n:'P1-2',t:'g',sub:"Accepting our imperfections can make us better people",q:'"us"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-3',t:'g',sub:"Accepting our imperfections can make us better people",q:'"better people"의 역할은?',c:['S','O','DO','OC'],a:'OC'},
+  {n:'P1-4',t:'g',sub:"Accepting our imperfections can make us better people",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-5',t:'g',sub:"Studying history can make you more knowledgeable",q:'"you"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-6',t:'g',sub:"Studying history can make you more knowledgeable",q:'"more knowledgeable"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-7',t:'g',sub:"Studying history can make you more knowledgeable",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-8',t:'g',sub:"The uncommonly dry weather drove the fire out of control",q:'"drove"의 역할은?',c:['Vi(자동사)','Vt(타동사)','SC','OC'],a:'Vt(타동사)'},
+  {n:'P1-9',t:'g',sub:"The uncommonly dry weather drove the fire out of control",q:'"the fire"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-10',t:'g',sub:"The uncommonly dry weather drove the fire out of control",q:'"out of control"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-11',t:'g',sub:"The uncommonly dry weather drove the fire out of control",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-12',t:'g',sub:"The noise from outside kept me awake all night",q:'"kept"의 역할은?',c:['Vi(자동사)','Vt(타동사)','SC','OC'],a:'Vt(타동사)'},
+  {n:'P1-13',t:'g',sub:"The noise from outside kept me awake all night",q:'"me"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-14',t:'g',sub:"The noise from outside kept me awake all night",q:'"awake"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-15',t:'g',sub:"The noise from outside kept me awake all night",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-16',t:'g',sub:"I think some documentaries on TV very educational",q:'"think"의 역할은?',c:['Vi(자동사)','Vt(타동사)','SC','OC'],a:'Vt(타동사)'},
+  {n:'P1-17',t:'g',sub:"I think some documentaries on TV very educational",q:'"some documentaries"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-18',t:'g',sub:"I think some documentaries on TV very educational",q:'"very educational"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-19',t:'g',sub:"I think some documentaries on TV very educational",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-20',t:'g',sub:"Sports commentators considered him this year's best player",q:'"him"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-21',t:'g',sub:"Sports commentators considered him this year's best player",q:'"this year\'s best player"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-22',t:'g',sub:"Sports commentators considered him this year's best player",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-23',t:'g',sub:"I found the information very useful to our work",q:'"the information"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-24',t:'g',sub:"I found the information very useful to our work",q:'"very useful"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-25',t:'g',sub:"Some people call the brain a living computer",q:'"the brain"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-26',t:'g',sub:"Some people call the brain a living computer",q:'"a living computer"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-27',t:'g',sub:"Some people call the brain a living computer",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+  {n:'P1-28',t:'g',sub:"Many readers found this book helpful in learning English",q:'"this book"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-29',t:'g',sub:"Many readers found this book helpful in learning English",q:'"helpful"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-30',t:'g',sub:"We believe him honest in the performance of his duties",q:'"him"의 역할은?',c:['S','IO','O','OC'],a:'O'},
+  {n:'P1-31',t:'g',sub:"We believe him honest in the performance of his duties",q:'"honest"의 역할은?',c:['S','O','SC','OC'],a:'OC'},
+  {n:'P1-32',t:'g',sub:"We believe him honest in the performance of his duties",q:'이 문장의 형식은?',c:['3형식','4형식','5형식','2형식'],a:'5형식'},
+
+  // ── Part 2: 핵심 동사 뜻 (g) ──────────────────────────────
+  {n:'P2-1',t:'g',sub:'',q:'"make"의 5형식 뜻은?',c:['~라고 부르다','~하게 만들다','~라고 믿다','~한 상태로 유지하다'],a:'~하게 만들다'},
+  {n:'P2-2',t:'g',sub:'',q:'"drive"의 5형식 뜻은?',c:['~라고 부르다','~라고 여기다','~하게 만들다','~라고 믿다'],a:'~하게 만들다'},
+  {n:'P2-3',t:'g',sub:'',q:'"keep"의 5형식 뜻은?',c:['~하게 만들다','~한 상태로 유지하다','~라고 부르다','~라고 생각하다'],a:'~한 상태로 유지하다'},
+  {n:'P2-4',t:'g',sub:'',q:'"think"의 5형식 뜻은?',c:['~라고 부르다','~라고 믿다','~라고 생각하다','~한 상태로 유지하다'],a:'~라고 생각하다'},
+  {n:'P2-5',t:'g',sub:'',q:'"consider"의 5형식 뜻은?',c:['~라고 부르다','~라고 여기다','~라고 믿다','~하게 만들다'],a:'~라고 여기다'},
+  {n:'P2-6',t:'g',sub:'',q:'"find"의 5형식 뜻은?',c:['~라고 부르다','~하게 만들다','~라고 여기다','~라고 생각하다'],a:'~라고 여기다'},
+  {n:'P2-7',t:'g',sub:'',q:'"call"의 5형식 뜻은?',c:['~라고 여기다','~라고 믿다','~라고 부르다','~하게 만들다'],a:'~라고 부르다'},
+  {n:'P2-8',t:'g',sub:'',q:'"believe"의 5형식 뜻은?',c:['~라고 부르다','~라고 믿다','~한 상태로 유지하다','~라고 여기다'],a:'~라고 믿다'},
+
+  // ── Part 3: 규칙 및 어형 (g) ──────────────────────────────
+  {n:'P3-1',t:'g',sub:'',q:'목적격보어(OC)는 무엇을 설명하는가?',c:['목적어를 설명한다','동사를 설명한다','주어를 설명한다','보어를 설명한다'],a:'목적어를 설명한다'},
+  {n:'P3-2',t:'g',sub:'I found the book ______',q:'빈칸에 알맞은 것은?',c:['interesting','interestingly'],a:'interesting'},
+  {n:'P3-3',t:'g',sub:'The noise kept me ______',q:'빈칸에 알맞은 것은?',c:['awake','awakefully'],a:'awake'},
+  {n:'P3-4',t:'g',sub:'They consider him ______',q:'빈칸에 알맞은 것은?',c:['smart','smartly'],a:'smart'},
+  {n:'P3-5',t:'g',sub:'',q:'5형식에서 목적격보어로 올 수 없는 것은?',c:['형용사','명사','부사','분사'],a:'부사'},
+  {n:'P3-6',t:'g',sub:'Some people call the brain ______',q:'"call"이 쓰인 5형식에서 OC로 알맞은 것은?',c:['a living computer','computerly','computation','to compute'],a:'a living computer'},
+
+  // ── Part 4: 어순배열 영작 (o) ──────────────────────────────
+  {n:'P4-1',t:'o',ko:'이 책은 나를 더 나은 사람으로 만든다',en:'_____',ws:['makes','me','better','This book'],a:'This book makes me better'},
+  {n:'P4-2',t:'o',ko:'우리의 결점을 인정하는 것은 우리를 더 나은 사람으로 만들 수 있다',en:'_____',ws:['can make','us','better people','Accepting our imperfections'],a:'Accepting our imperfections can make us better people'},
+  {n:'P4-3',t:'o',ko:'바깥 소음은 나를 밤새 깨어 있게 했다',en:'_____',ws:['kept','me','awake all night','The noise from outside'],a:'The noise from outside kept me awake all night'},
+  {n:'P4-4',t:'o',ko:'어떤 사람들은 뇌를 살아있는 컴퓨터라고 부른다',en:'_____',ws:['call','the brain','a living computer','Some people'],a:'Some people call the brain a living computer'},
+  {n:'P4-5',t:'o',ko:'해설자들은 그를 올해 최고의 선수로 여겼다',en:'_____',ws:['considered','him','this year\'s best player','Sports commentators'],a:"Sports commentators considered him this year's best player"},
+  {n:'P4-6',t:'o',ko:'역사를 공부하는 것은 너를 더 지식 있게 만들 수 있다',en:'_____',ws:['can make','you','more knowledgeable','Studying history'],a:'Studying history can make you more knowledgeable'},
+  {n:'P4-7',t:'o',ko:'나는 그 정보가 우리 일에 매우 유용하다고 생각했다',en:'_____',ws:['found','the information','very useful','I','to our work'],a:'I found the information very useful to our work'},
+  {n:'P4-8',t:'o',ko:'우리는 그가 정직하다고 믿는다',en:'_____',ws:['believe','him','honest','We'],a:'We believe him honest'},
+];
+
+const TOTAL=20, CUTLINE=18;
+const T_G=5, T_B=10, T_O=30;
+const CIRCUM=2*Math.PI*20;
+const STORAGE_KEY='quiz_history_5form';
+
+let questions=[], idx=0, answers={}, timeouts={}, screen='intro';
+let timerSec=5, timerInterval=null, advancing=false;
+let orderPlaced=[], orderAvail=[];
+
+function loadHistory(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
+function saveHistory(correct,total,cutline,wrongItems){
+  const hist=loadHistory();
+  hist.unshift({
+    date:new Date().toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    correct,total,cutline,pct:Math.round((correct/total)*100),pass:correct>=cutline,wrongs:wrongItems
+  });
+  if(hist.length>20)hist.pop();
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(hist));}catch{}
+}
+
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function getTime(q){return q.t==='o'?T_O:q.t==='b'?T_B:T_G;}
+
+function start(){
+  questions=shuffle(ALL_Q).slice(0,TOTAL);
+  idx=0;answers={};timeouts={};screen='quiz';advancing=false;
+  initOrder();startTimer();render();
+}
+
+function initOrder(){
+  const q=questions[idx];
+  if(q&&q.t==='o'){orderAvail=shuffle([...q.ws]);orderPlaced=[];}
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timerSec=getTime(questions[idx]);
+  timerInterval=setInterval(()=>{timerSec--;updateTimerUI();if(timerSec<=0)onTimeout();},1000);
+}
+
+function updateTimerUI(){
+  const ring=document.querySelector('.ring-fill');
+  const num=document.querySelector('.timer-num');
+  const wrap=document.querySelector('.tw-inner');
+  if(!ring||!num)return;
+  const mx=getTime(questions[idx]);
+  ring.style.strokeDashoffset=CIRCUM*(1-(timerSec/mx));
+  num.textContent=timerSec;
+  if(wrap)wrap.className='tw-inner'+(timerSec<=Math.ceil(mx*.12)?'td':timerSec<=Math.ceil(mx*.3)?'tw':'');
+}
+
+function onTimeout(){
+  if(advancing)return;
+  clearInterval(timerInterval);
+  timeouts[idx]=true;
+  answers[idx]='__timeout__';
+  advancing=true;
+  render();
+  setTimeout(()=>{advancing=false;advance();},1300);
+}
+
+function advance(){
+  if(idx<TOTAL-1){advancing=false;idx++;initOrder();startTimer();render();}
+  else{clearInterval(timerInterval);screen='result';render();}
+}
+
+function isCorrect(q,qi){
+  const a=answers[qi];
+  if(!a||a==='__timeout__')return false;
+  if(q.t==='g')return a===q.a;
+  if(q.t==='b')return a.trim().toLowerCase()===q.a.toLowerCase();
+  if(q.t==='o')return a.trim().toLowerCase()===q.a.trim().toLowerCase();
+  return false;
+}
+
+function scoreQ(){return questions.reduce((c,q,qi)=>isCorrect(q,qi)?c+1:c,0);}
+function typeLabel(t){return t==='g'?'선택형':t==='b'?'빈칸 입력':'어순 배열';}
+function typeCls(t){return t==='g'?'tb-g':t==='b'?'tb-b':'tb-o';}
+function typeTime(t){return t==='g'?'5초':t==='b'?'10초':'30초';}
+
+function render(){
+  const app=document.getElementById('app');
+  if(screen==='intro')app.innerHTML=renderIntro();
+  else if(screen==='quiz')app.innerHTML=renderQuiz();
+  else app.innerHTML=renderResult();
+  attachEvents();
+}
+
+function renderIntro(){
+  const types=['g','b','o'];
+  const dots={g:'#185FA5',b:'#6B3FA0',o:'#BA7517'};
+  const hist=loadHistory();
+  const histHtml=hist.length===0
+    ?`<div class="hist-empty">아직 풀이 기록이 없어요</div>`
+    :hist.map((h,hi)=>{
+      const wrongHtml=(h.wrongs&&h.wrongs.length>0)
+        ?h.wrongs.map(w=>`<div class="hd-item ${w.isTO?'hd-to':'hd-ng'}">
+            <div class="hd-qnum">${w.n} &nbsp;<span class="type-badge ${w.tcls}" style="font-size:10px;padding:2px 7px;">${w.tlbl}</span>${w.isTO?' ⏰':''}</div>
+            ${w.en?`<div class="hd-en">${w.en}</div>`:''}
+            <div class="hd-tags">
+              <span class="tag tag-ng">${w.isTO?'시간초과':'선택/입력: '+w.ua}</span>
+              <span class="tag tag-ok">정답: ${w.ans}</span>
+            </div>
+          </div>`).join('')
+        :`<div style="font-size:12px;color:var(--hint);text-align:center;padding:8px 0;">오답 없음 🎉</div>`;
+      return `<div class="hist-item" data-hi="${hi}">
+        <div class="hist-top">
+          <div class="hist-left">
+            <div class="hist-date">${h.date}</div>
+            <div class="hist-score ${h.pass?'pass':'fail'}">${h.correct} / ${h.total}</div>
+            <div class="hist-bar-wrap"><div class="hist-bar" style="width:${h.pct}%;background:${h.pass?'var(--green)':'var(--red)'}"></div></div>
+            <div class="hist-pct">정답률 ${h.pct}%</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <span class="hist-badge ${h.pass?'hb-pass':'hb-fail'}">${h.pass?'합격':'불합격'}</span>
+            <span style="font-size:11px;color:var(--muted);" class="hist-toggle-txt">오답 보기 ▼</span>
+          </div>
+        </div>
+        <div class="hist-detail" id="hd-${hi}">${wrongHtml}</div>
+      </div>`;
+    }).join('');
+  return `<div class="intro-box">
+  <div class="intro-logo">영문법 · 5형식</div>
+  <div class="intro-title">5형식 종합 퀴즈</div>
+  <div class="intro-sub">5형식 구조 · 동사 · 규칙 · 영작</div>
+  <div class="type-legend">${types.map(t=>`<span class="type-badge ${typeCls(t)}">${typeLabel(t)}</span>`).join('')}</div>
+  <div class="info-grid">
+    <div class="info-card"><div class="info-num">${TOTAL}</div><div class="info-lbl">랜덤 문항</div></div>
+    <div class="info-card"><div class="info-num">${CUTLINE}개</div><div class="info-lbl">합격 커트라인</div></div>
+    <div class="info-card"><div class="info-num">3가지</div><div class="info-lbl">문제 유형</div></div>
+  </div>
+  <div class="time-grid">${types.map(t=>`<div class="time-card"><div class="time-dot" style="background:${dots[t]}"></div><div><div class="time-lbl">${typeLabel(t)}</div><div class="time-val">제한 ${typeTime(t)}</div></div></div>`).join('')}</div>
+  <button class="start-btn" id="start-btn">시작하기</button>
+  <div class="hist-section">
+    <div class="hist-title">
+      <span>📋 이전 풀이 기록 (최대 20회)</span>
+      ${hist.length>0?`<button class="hist-clear" id="hist-clear">기록 삭제</button>`:''}
+    </div>
+    ${histHtml}
+  </div>
+</div>`;
+}
+
+function renderQuiz(){
+  const q=questions[idx];
+  const mx=getTime(q);
+  const pct=Math.round((idx/TOTAL)*100);
+  const offset=CIRCUM*(1-(timerSec/mx));
+  const twCls=timerSec<=Math.ceil(mx*.12)?'td':timerSec<=Math.ceil(mx*.3)?'tw':'';
+  const isTO=timeouts[idx];
+
+  let bodyHtml='';
+  if(isTO){
+    bodyHtml=`<div class="timeout-msg">⏰ 시간 초과! &nbsp;정답: <strong>${q.a}</strong></div>`;
+  } else if(q.t==='g'&&!answers[idx]){
+    bodyHtml=`<div class="blank-lbl">${q.q}</div>
+    <div class="choices">${q.c.map(c=>`<button class="choice-btn" data-ch="${c}">${c}</button>`).join('')}</div>`;
+  } else if(q.t==='b'&&!answers[idx]){
+    bodyHtml=`<div class="blank-hint">${q.hint}</div>
+    <div class="blank-input-wrap">
+      <input class="blank-input" id="blank-inp" type="text" placeholder="영어로 입력하세요" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="submit-btn" id="blank-sub">확인</button>
+    </div>`;
+  } else if(q.t==='b'&&answers[idx]){
+    const ok=answers[idx].trim().toLowerCase()===q.a.toLowerCase();
+    bodyHtml=`<div class="answer-reveal ${ok?'ar-ok':'ar-ng'}">${ok?'✓ 정답입니다!':'✗ 오답 — 정답: <strong>'+q.a+'</strong>'}</div>`;
+  } else if(q.t==='o'&&!answers[idx]){
+    const placedHtml=orderPlaced.length>0?orderPlaced.map((w,i)=>`<span class="word-chip wc-placed" data-pi="${i}">${w}</span>`).join(''):`<span style="font-size:12px;color:var(--hint)">단어를 클릭해서 순서대로 배열하세요</span>`;
+    const availHtml=orderAvail.map((w,i)=>`<span class="word-chip wc-avail" data-ai="${i}">${w}</span>`).join('');
+    bodyHtml=`<div class="order-area-lbl">배열 순서</div>
+    <div class="order-area ${orderPlaced.length>0?'filled':''}">${placedHtml}</div>
+    <div class="order-area-lbl" style="margin-top:10px;">단어 목록</div>
+    <div class="order-area">${availHtml}</div>
+    <button class="order-check-btn" id="order-check" ${orderPlaced.length===0?'disabled':''}>정답 확인</button>`;
+  } else if(q.t==='o'&&answers[idx]){
+    const ok=answers[idx].trim().toLowerCase()===q.a.trim().toLowerCase();
+    bodyHtml=`<div class="answer-reveal ${ok?'ar-ok':'ar-ng'}">${ok?'✓ 정답입니다!':'✗ 오답 — 정답: <strong>'+q.a+'</strong>'}</div>`;
+  }
+
+  return `<div class="hd-row">
+  <div class="quiz-counter">문항 ${idx+1} / ${TOTAL}</div>
+  <div class="cutline-chip">커트라인 ${CUTLINE}개</div>
+</div>
+<div class="progress-wrap"><div class="progress-fill" style="width:${pct}%"></div></div>
+<div class="timer-row">
+  <div class="timer-block">
+    <div class="timer-lbl">남은시간</div>
+    <div class="tw-inner ${twCls}">
+      <div class="timer-ring">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="ring-bg" cx="26" cy="26" r="20"/>
+          <circle class="ring-fill" cx="26" cy="26" r="20" stroke-dasharray="${CIRCUM}" stroke-dashoffset="${offset}"/>
+        </svg>
+        <div class="timer-num">${timerSec}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="q-card">
+  <div class="q-num">${q.n} &nbsp;<span class="type-badge ${typeCls(q.t)}">${typeLabel(q.t)}</span></div>
+  ${q.sub?`<div class="q-en">${q.sub}</div>`:''}
+  ${q.ko?`<div class="q-ko">${q.ko}</div>`:''}
+  ${q.q&&q.t!=='o'?`<div class="q-sub">${q.q}</div>`:''}
+  ${q.t==='o'?`<div class="q-sub">위 한국어를 영어로 배열하세요</div>`:''}
+  ${bodyHtml}
+</div>`;
+}
+
+function renderResult(){
+  const correct=scoreQ();
+  const toCount=Object.keys(timeouts).length;
+  const pass=correct>=CUTLINE;
+  const pct=Math.round((correct/TOTAL)*100);
+  const emoji=pass?(correct===TOTAL?'🎉':'👍'):(correct>=15?'💪':'📚');
+  const wrongIdxs=questions.map((_,qi)=>qi).filter(qi=>!isCorrect(questions[qi],qi));
+  const wrongItems=wrongIdxs.map(qi=>{
+    const q=questions[qi];
+    const isTO=!!timeouts[qi];
+    const ua=isTO?'시간초과':(answers[qi]||'?');
+    return {n:q.n,t:q.t,tlbl:typeLabel(q.t),tcls:typeCls(q.t),en:q.sub||q.ko||'',ans:q.a,ua,isTO};
+  });
+  saveHistory(correct,TOTAL,CUTLINE,wrongItems);
+
+  return `<div class="result-card">
+  <div class="result-emoji">${emoji}</div>
+  <div class="result-score ${pass?'score-pass':'score-fail'}">${correct} / ${TOTAL}</div>
+  <div class="result-badge ${pass?'badge-pass':'badge-fail'}">${pass?'합격 ✓':'불합격 ✗'} · 커트라인 ${CUTLINE}개</div>
+  <div class="result-pct">정답률 ${pct}%</div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num s-ok">${correct}</div><div class="stat-lbl">정답</div></div>
+    <div class="stat-card"><div class="stat-num s-ng">${TOTAL-correct-toCount}</div><div class="stat-lbl">오답</div></div>
+    <div class="stat-card"><div class="stat-num s-to">${toCount}</div><div class="stat-lbl">시간초과</div></div>
+  </div>
+  <button class="retry-btn" id="retry-btn">다시 풀기 (새 랜덤 20문항)</button>
+</div>
+${wrongIdxs.length>0?`
+<div class="review-title">오답 목록 (${wrongIdxs.length}개)</div>
+${wrongIdxs.map(qi=>{
+  const q=questions[qi];
+  const isTO=!!timeouts[qi];
+  const ua=isTO?'시간초과':(answers[qi]||'?');
+  return `<div class="review-item ${isTO?'to':''}">
+    <div class="r-num">${q.n} &nbsp;<span class="type-badge ${typeCls(q.t)}">${typeLabel(q.t)}</span>${isTO?' ⏰':''}</div>
+    ${q.sub?`<div class="r-en">${q.sub}</div>`:''}
+    ${q.ko?`<div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${q.ko}</div>`:''}
+    ${q.q?`<div style="font-size:13px;color:var(--text);margin-bottom:6px;">${q.q}</div>`:''}
+    <span class="tag ${isTO?'tag-to':'tag-ng'}">${isTO?'시간초과':'선택/입력: '+ua}</span>
+    <span class="tag tag-ok">정답: ${q.a}</span>
+  </div>`;}).join('')}`
+:`<div style="text-align:center;color:var(--green);font-weight:800;padding:20px;font-size:15px;">전 문항 정답! 완벽합니다 🎉</div>`}`;
+}
+
+function attachEvents(){
+  const app=document.getElementById('app');
+  const s=app.querySelector('#start-btn');if(s)s.addEventListener('click',start);
+  const r=app.querySelector('#retry-btn');if(r)r.addEventListener('click',start);
+  const hc=app.querySelector('#hist-clear');if(hc)hc.addEventListener('click',()=>{try{localStorage.removeItem(STORAGE_KEY);}catch{}render();});
+
+  app.querySelectorAll('.hist-item').forEach(item=>{
+    item.addEventListener('click',e=>{
+      if(e.target.closest('#hist-clear'))return;
+      const hi=item.dataset.hi;
+      const detail=document.getElementById('hd-'+hi);
+      if(!detail)return;
+      const isOpen=detail.classList.contains('open');
+      app.querySelectorAll('.hist-detail').forEach(d=>d.classList.remove('open'));
+      app.querySelectorAll('.hist-toggle-txt').forEach(t=>{t.textContent='오답 보기 ▼';});
+      if(!isOpen){
+        detail.classList.add('open');
+        const txt=item.querySelector('.hist-toggle-txt');
+        if(txt)txt.textContent='닫기 ▲';
+      }
+    });
+  });
+
+  app.querySelectorAll('.choice-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    if(answers[idx]!==undefined)return;
+    const ch=btn.dataset.ch;
+    const q=questions[idx];
+    answers[idx]=ch;
+    const ok=ch===q.a;
+    btn.classList.add(ok?'correct':'wrong');
+    btn.parentElement.querySelectorAll('.choice-btn').forEach(b2=>{
+      b2.disabled=true;
+      if(!ok&&b2.dataset.ch===q.a)b2.classList.add('correct');
+    });
+    setTimeout(()=>advance(),ok?400:800);
+  }));
+
+  const bi=app.querySelector('#blank-inp'),bs=app.querySelector('#blank-sub');
+  if(bi&&bs){
+    const doSub=()=>{
+      const val=bi.value.trim();if(!val)return;
+      clearInterval(timerInterval);
+      answers[idx]=val;
+      const ok=val.toLowerCase()===questions[idx].a.toLowerCase();
+      bi.classList.add(ok?'correct':'wrong');bi.disabled=true;bs.disabled=true;
+      const fb=document.createElement('div');
+      fb.className=`answer-reveal ${ok?'ar-ok':'ar-ng'}`;
+      fb.innerHTML=ok?'✓ 정답입니다!':'✗ 오답 — 정답: <strong>'+questions[idx].a+'</strong>';
+      bs.parentElement.parentElement.appendChild(fb);
+      setTimeout(()=>advance(),ok?600:1100);
+    };
+    bs.addEventListener('click',doSub);
+    bi.addEventListener('keydown',e=>{if(e.key==='Enter')doSub();});
+    setTimeout(()=>bi.focus(),80);
+  }
+
+  app.querySelectorAll('.wc-placed').forEach(chip=>chip.addEventListener('click',()=>{
+    const i=parseInt(chip.dataset.pi);
+    orderAvail.push(orderPlaced[i]);orderPlaced.splice(i,1);render();
+  }));
+  app.querySelectorAll('.wc-avail').forEach(chip=>chip.addEventListener('click',()=>{
+    const i=parseInt(chip.dataset.ai);
+    orderPlaced.push(orderAvail[i]);orderAvail.splice(i,1);render();
+  }));
+
+  const oc=app.querySelector('#order-check');
+  if(oc)oc.addEventListener('click',()=>{
+    if(orderPlaced.length===0)return;
+    clearInterval(timerInterval);
+    const ua=orderPlaced.join(' ');
+    answers[idx]=ua;
+    const ok=ua.trim().toLowerCase()===questions[idx].a.trim().toLowerCase();
+    const fb=document.createElement('div');
+    fb.className=`answer-reveal ${ok?'ar-ok':'ar-ng'}`;
+    fb.innerHTML=ok?'✓ 정답입니다!':'✗ 오답 — 정답: <strong>'+questions[idx].a+'</strong>';
+    oc.parentElement.appendChild(fb);
+    oc.disabled=true;
+    app.querySelectorAll('.word-chip').forEach(c=>c.style.pointerEvents='none');
+    setTimeout(()=>advance(),ok?600:1200);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
